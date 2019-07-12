@@ -1,0 +1,8 @@
+VAR CONSTANT
+	sikoCAN_NMT : USINT := 1;
+	sikoCAN_SDO : USINT := 2;
+	sikoCAN_TPRD : USINT := 3;
+	sikoCAN_RPRD : USINT := 4;
+	sikoSlaveSupportedNum : USINT := 2;
+	sikoSlaveSupported : ARRAY[0..1] OF STRING[5] := ['ag06','ap05'];
+END_VAR

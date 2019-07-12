@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<?AutomationStudio Version=4.5.2.102?>
+<Library SubType="ANSIC" xmlns="http://br-automation.co.at/AS/Library">
+  <Files>
+    <File Description="Exported data types">siko.typ</File>
+    <File Description="Exported constants">siko.var</File>
+    <File Description="Exported functions and function blocks">siko.fun</File>
+    <File>siko.c</File>
+    <File>sikoJob.c</File>
+    <File>sikoCan.c</File>
+    <File>sikoSlave.c</File>
+    <File>sikoAG06.c</File>
+    <File>sikoAG06.typ</File>
+  </Files>
+  <Dependencies>
+    <Dependency ObjectName="AsCANopen" />
+    <Dependency ObjectName="AsBrStr" />
+    <Dependency ObjectName="AsTime" />
+    <Dependency ObjectName="sys_lib" />
+    <Dependency ObjectName="brsystem" />
+  </Dependencies>
+</Library>
