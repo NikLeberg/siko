@@ -5,6 +5,7 @@
     <File Description="Exported data types">siko.typ</File>
     <File Description="Exported constants">siko.var</File>
     <File Description="Exported functions and function blocks">siko.fun</File>
+    <File>sikoInternal.h</File>
     <File>siko.c</File>
     <File>sikoJob.c</File>
     <File>sikoCan.c</File>

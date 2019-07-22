@@ -3,8 +3,8 @@
  * Description:	SIKO System für geführte oder vollautomatische Positionierung
  *              von Formateinstellungen.
  * Author:      Niklaus Leuenberger (@NikLeberg)
- * Version:     0.1
- * Date:        2019-07-12
+ * Version:     0.2
+ * Date:        2019-07-22
  *********************************************************************************/
 
 #include <bur/plctypes.h>
@@ -20,7 +20,7 @@ unsigned long sikoConfig(siko_typ* s, plcstring* interface) {
 	RTInfo_typ rtInfo;
 	rtInfo.enable = 1;
 	RTInfo(&rtInfo);
-	s->cycleTime = (rtInfo.cycle_time / 1000); // us -> ms
+    s->cycleTime = (rtInfo.cycle_time / 1000); // us -> ms
 	// Slaves müssen einzeln und manuell konfiguriert werden.
 	return sikoERR_OK;
 }
@@ -45,4 +45,5 @@ unsigned long sikoRun(siko_typ* s) {
 	// Sicherheit
 	// Not-Stopp auslösen?
 	if (error) return error; // Jobs noch busy oder Fehlerhaft
+    return sikoERR_OK;
 }

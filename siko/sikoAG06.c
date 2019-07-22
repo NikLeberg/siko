@@ -2,8 +2,8 @@
  * Filename:    sikoAG06.c
  * Description:	HAL für SIKO AG06 Stellantriebe.
  * Author:      Niklaus Leuenberger (@NikLeberg)
- * Version:     0.1
- * Date:        2019-07-12
+ * Version:     0.2
+ * Date:        2019-07-22
  *********************************************************************************/
 
 #include <bur/plctypes.h>
@@ -13,7 +13,7 @@
 unsigned char sikoAG06stateGet(unsigned char statusWord) {
 	// Not Ready To Switch On
 	if ((statusWord & 0b01001111) == 0b00000000) return sikoAG06_STATE_N_RDY;
-	// Switch On Disabled		
+	// Switch On Disabled
 	else if ((statusWord & 0b01001111) == 0b01000000) return sikoAG06_STATE_SW_ON_DIS;
 	// Ready to Switch On
 	else if ((statusWord & 0b01101111) == 0b00100001) return sikoAG06_STATE_RDY_SW_ON;
@@ -64,10 +64,10 @@ unsigned long sikoAG06stateSet(siko_typ* s, sikoJob_typ* j) {
 	unsigned short command = sikoAG06stateT[stateRequested][state];
 	if (command == sikoAG06_IEQUAL) return sikoERR_OK; // ist == soll, nichts machen
 	if (command == sikoAG06_AUTOMA) return sikoERR_OK; // automatisch, nichts machen
-	if (command == sikoAG06_NALLOW) return sikoERR_STATE; // übergang nicht möglich / ungültig
+    if (command == sikoAG06_NALLOW) return sikoERR_STATE; // Übergang nicht möglich / ungültig
+    if (command == sikoAG06_ENOPER && j->step && state == stateRequested) return sikoERR_OK; // Spezialfall EN_OP, wenn bereits einmal gesendet
 	// Maximal 10x versuchen
-	++j->step;
-	if (j->step == 10) return sikoERR_STATE;
+	if (++j->step == 10) return sikoERR_STATE;
 	// State per Command wechseln
 	sikoJobPrequeue(s, j->slave, (unsigned long) &sikoSlaveControl, command);
 	return ERR_FUB_BUSY;

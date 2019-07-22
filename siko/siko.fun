@@ -41,14 +41,6 @@ FUNCTION sikoSlaveControl : UDINT (*Slave Control Word setzen*)
 	END_VAR
 END_FUNCTION
 
-FUNCTION sikoSlaveStatusSetInternal : UDINT (*Setze lokalen Status eines Slaves*)
-	VAR_INPUT
-		s : siko_typ;
-		slave : USINT;
-		status : sikoSLAVE_STATUS;
-	END_VAR
-END_FUNCTION
-
 FUNCTION sikoSlaveInitJob : UDINT
 	VAR_INPUT
 		s : siko_typ;
@@ -114,13 +106,6 @@ FUNCTION sikoCanRegister : UDINT (*Cob-ID eines Slaves im Master registrieren*)
 END_FUNCTION
 
 FUNCTION sikoCanNMT : UDINT (*CANopen-NMT*)
-	VAR_INPUT
-		s : siko_typ;
-		j : sikoJob_typ;
-	END_VAR
-END_FUNCTION
-
-FUNCTION sikoCanSync : UDINT (*CANopen-NMT*)
 	VAR_INPUT
 		s : siko_typ;
 		j : sikoJob_typ;
@@ -198,6 +183,13 @@ END_FUNCTION
 FUNCTION sikoRun : UDINT (*Bearbeite SIKO System*)
 	VAR_INPUT
 		s : siko_typ;
+	END_VAR
+END_FUNCTION
+
+FUNCTION sikoCanBootupAwait : UDINT (*CANopen-Bootup*)
+	VAR_INPUT
+		s : siko_typ;
+		j : sikoJob_typ;
 	END_VAR
 END_FUNCTION
 

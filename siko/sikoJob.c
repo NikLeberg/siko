@@ -3,8 +3,8 @@
  * Description:	Implementiert eine Warteschlange an Jobs um Zyklusgerecht alle
                 Bibliotheksfunktionen zu behandeln.
  * Author:      Niklaus Leuenberger (@NikLeberg)
- * Version:     0.1
- * Date:        2019-07-12
+ * Version:     0.2
+ * Date:        2019-07-22
  *********************************************************************************/
 
 #include <bur/plctypes.h>
@@ -32,19 +32,22 @@ typedef unsigned long(*sikoJobFunction)(siko_typ* s, sikoJob_typ* j);
 /* Jobs abarbeiten */
 unsigned long sikoJobRun(siko_typ* s) {
 	if (!s) return sikoERR_NULL;
-	// solange Jobs abarbeiten bis entweder
-	// - Job mittels ERR_FUB_BUSY blockiert
-	// - oder Zykluszeit abglaufen ist (10% Sicherheitsfaktor)
+	// solange Jobs abarbeiten bis entweder:
+    // - Zykluszeit erreicht (10% Sicherheitsfaktor)
+    // - Job blockiert und auf externe Library wartet
 	plctime tStart = clock_ms();
 	while ((clock_ms() - tStart) < (s->cycleTime * 0.9)) {
-		if (!s->job || !s->job->run) return sikoERR_OK;
+		if (!s->job || !s->job->run) return sikoERR_NULL;
 		// Job ausführen
 		sikoJob_typ* j = s->job;
 		j->error = ((sikoJobFunction)j->run)(s, j);
-		// Job blockiert -> Ende
-		if (j->error == ERR_FUB_BUSY) return ERR_FUB_BUSY;
-		// Job fertig -> Löschen & nächster Job starten
-		sikoJobDequeue(s);
+        // Job blockiert und hat kein Prev-Job gespawnt (wartet auf libAsCANopen)
+        if (j->error == ERR_FUB_BUSY && j == s->job) return ERR_FUB_BUSY;
+		// Job fertig
+        if (j->error != ERR_FUB_BUSY) {
+            if (sikoJobDequeue(s)) return sikoERR_MEMORY;
+            return sikoERR_OK;
+        }
 	}
 	return sikoERR_OK;
 }
@@ -65,8 +68,7 @@ unsigned long sikoJobFree(sikoJob_typ* j) {
 /* Neuen Job registrieren */
 unsigned long sikoJobEnqueue(siko_typ* s, unsigned char slave, unsigned long jobFunction, unsigned long parameter) {
 	// Übergebene Parameter prüfen
-	if (!s) return sikoERR_NULL;
-	if (!jobFunction) return sikoERR_NULL;
+	if (!s || !jobFunction) return sikoERR_NULL;
 	// neuen Job aufsetzen
 	sikoJob_typ* newJob;
 	if (sikoJobAlloc(&newJob)) return sikoERR_MEMORY;
@@ -126,11 +128,18 @@ unsigned long sikoJobDequeue(siko_typ* s) {
 /* Warteschlange löschen */
 unsigned long sikoJobClear(siko_typ* s) {
 	while (s->numJobs) sikoJobDequeue(s);
+    return sikoERR_OK;
 }
 
 /* Wartet eine einstellbare Zeit */
 unsigned long sikoJobSleep(siko_typ* s, sikoJob_typ* j) {
+    // Parameter verarbeiten
+    if (j->parameter) {
+        j->step = j->parameter / s->cycleTime;
+        j->parameter = 0;
+    }
 	// Warte
-	if (clock_ms() < j->parameter) return ERR_FUB_BUSY;
-	else return sikoERR_OK;
+    if (j->step) --j->step;
+    else return sikoERR_OK;
+    return ERR_FUB_BUSY;
 }

@@ -1,8 +1,6 @@
 
 TYPE
 	sikoCan_typ : 	STRUCT  (*CANopen Einstellungen und Kommunikationsobjekte*)
-		sync : CANopenEnableCyclicSync;
-		syncOnce : CANopenSendSync;
 		nmt : CANopenNMT;
 		bootup : CANopenRecvBootupDev;
 		pdoWrite : CANopenPDOWrite8;
@@ -24,13 +22,9 @@ TYPE
 		length : USINT; (*Länge der zu schreibenden Daten*)
 	END_STRUCT;
 	sikoSlave_typ : 	STRUCT 
-		statusStateMachine : USINT;
 		statusSiko : UINT; (*Status des Slaves gemäss Statemachine*)
-		statusInternal : USINT; (*Interner Bibliotheksstatus*)
 		statusCan : USINT; (*CANopen Status*)
-		machine : USINT; (*Maschinenzugehörigkeit*)
-		position : USINT; (*Positionsnummer innerhalb der Maschine*)
-		type : STRING[5]; (*Slavetyp (aktuell unterstützt: ag05, ap05)*)
+		type : STRING[5]; (*Slavetyp (aktuell unterstützt: AG06)*)
 		hysteresis : DINT; (*Schleifenlänge der Mechanik*)
 		min : DINT; (*Minimalwert*)
 		max : DINT; (*Maximalwert*)
@@ -38,7 +32,6 @@ TYPE
 		setpoint : INT; (*Sollwert*)
 		timestamp : TIME; (*Zeitpunkt der letzten Status-Aktualisierung*)
 		canPDO : {REDUND_UNREPLICABLE} CANopenPDORead8; (*Slaveeigenes CAN Kommunikationsobjekt*)
-		canNMT : {REDUND_UNREPLICABLE} CANopenNMT; (*Slaveeigenes CAN Managementobjekt*)
 		parameters : REFERENCE TO sikoSlaveParameter_typ; (*Funktionspointer zur Slaveinitialisierung*)
 	END_STRUCT;
 	sikoJob_typ : 	STRUCT 
